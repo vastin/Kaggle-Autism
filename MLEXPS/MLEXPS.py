@@ -39,8 +39,8 @@ class MLEXPS:
     def startExpr(self):
         self.currModel.summary()
         self.setupExprDir()
-        checkpoint = keras.callbacks.callbacks.ModelCheckpoint(self.exprWeightPath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
-        csv = keras.callbacks.callbacks.CSVLogger(self.exprFilePath + '/logs/training/csvlog.csv', separator=',')
+        checkpoint = keras.callbacks.ModelCheckpoint(self.exprWeightPath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+        csv = keras.callbacks.CSVLogger(self.exprFilePath + '/logs/training/csvlog.csv', separator=',')
         cb = [checkpoint, csv]
         if 'callbacks' in self.currArgs:
             self.currArgs['callbacks'].append(checkpoint)

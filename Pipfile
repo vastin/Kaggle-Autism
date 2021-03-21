@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+matplotlib = "*"
+mtcnn = "*"
+keras = "*"
+tensorflow = "*"
+keras-vggface = "*"
+sklearn = "*"
+keras-applications = "*"
+pydot = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"

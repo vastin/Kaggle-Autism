@@ -37,7 +37,7 @@ accuracyCount = 0
 trainableCount = 30
 
 def SaveModelImage(Model, Title):
-    keras.utils.vis_utils.plot_model(Model, to_file=Title, show_shapes=True, show_layer_names=True)
+    keras.utils.plot_model(Model, to_file=Title, show_shapes=True, show_layer_names=True)
     return
 
 def Summary(Model):
@@ -138,10 +138,12 @@ if __name__ == "__main__":
     model.compile(keras.optimizers.Adam(lr=lr_rate), loss='categorical_crossentropy', metrics=['accuracy'])
     model.summary()
 
-    TrainPath = 'D:/Autism-Data/Kaggle/v' + str(Version) + '/train'
-    ValidPath = 'D:/Autism-Data/Kaggle/v' + str(Version) + '/valid'
-    TestPath  = 'D:/Autism-Data/Kaggle/v' + str(Version) + '/test'
-
+    # TrainPath = 'D:/Autism-Data/Kaggle/v' + str(Version) + '/train'
+    # ValidPath = 'D:/Autism-Data/Kaggle/v' + str(Version) + '/valid'
+    # TestPath  = 'D:/Autism-Data/Kaggle/v' + str(Version) + '/test'
+    TrainPath = 'data/train'
+    ValidPath = 'data/valid'
+    TestPath  = 'data/test'
     TrainGen = keras.preprocessing.image.ImageDataGenerator(
             preprocessing_function=preprocess_input_new,
             horizontal_flip=True,
@@ -170,9 +172,9 @@ if __name__ == "__main__":
     filepath = "models/h5/" + str(timestr) + "/" + "weights-improvement-{epoch:02d}-{val_accuracy:.4f}.hdf5"
     SaveModelImage(model, "models/h5/" + str(timestr) + "/" + "Graph.png")
     copyfile('face.py', "models/h5/" + str(timestr) + "/face.py")
-    checkpoint = keras.callbacks.callbacks.ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
-    reduce_lr = keras.callbacks.callbacks.ReduceLROnPlateau(monitor='val_accuracy', factor=0.9, patience=5, min_lr=0.00001)
-    ModelCallbacks = keras.callbacks.callbacks.LambdaCallback(
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+    reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_accuracy', factor=0.9, patience=5, min_lr=0.00001)
+    ModelCallbacks = keras.callbacks.LambdaCallback(
                             on_epoch_begin=None,
                             on_epoch_end=None,
                             on_batch_begin=None,
