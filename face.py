@@ -1,4 +1,6 @@
 import os
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+import argparse
 import glob
 import time
 import pydotplus as pydot
@@ -84,6 +86,12 @@ def MakeModel(dlsize):
     DerivedModel.compile(keras.optimizers.Adam(lr=lr_rate), loss='categorical_crossentropy', metrics=['accuracy'])
     return DerivedModel
 
+def MakeModel2():
+    model = keras.models.load_model(model_path)
+    for layer in model.layers:
+        layer.trainable = True
+    return model
+
 def clearWeights(model):
     weights = model.get_weights()
     for weight in weights:
@@ -132,8 +140,27 @@ class EarlyStoppingAtMinLoss(tf.keras.callbacks.Callback):
     print(self.epochCount)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--epoch", type=int, default=5, help="number of training epoch (default 5)")
+    parser.add_argument("-m", "--model", help="hdf5 weights file")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-T", "--testing", action="store_true", help="testing with hdf5 file")
+    group.add_argument("-O", "--tuning", action="store_true", help="tunning with hdf5 file")
+    args = parser.parse_args()
+
+    if args.testing:
+        load_model = True
+        model_path = args.model
+    if args.tuning:
+        lr_rate = 1e-5
+        load_model = True
+        model_path = args.model      
+
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    model = MakeModel(1024)
+    if args.tuning:
+        model = MakeModel2()
+    else:
+        model = MakeModel(1024)
     # model = resnet()
     # model = clearWeights(model)
     model.compile(keras.optimizers.Adam(lr=lr_rate), loss='categorical_crossentropy', metrics=['accuracy'])
@@ -184,8 +211,8 @@ if __name__ == "__main__":
                             on_train_end=None)
 
 
-    first = 5
-    if not load_model:
+    first = args.epoch
+    if not args.testing:
         # data = model.fit_generator(
         #        generator = TrainGen,
         #        validation_data= ValidGen,
@@ -194,7 +221,7 @@ if __name__ == "__main__":
         #        verbose=1)
         models = [model]
         args = [{'generator':TrainGen,
-                 'validation_data':TestGen,
+                 'validation_data':ValidGen,
                  'epochs':first,
                  'callbacks':[ModelCallbacks, reduce_lr, EarlyStoppingAtMinLoss()],
                  'verbose':1}]
@@ -208,7 +235,7 @@ if __name__ == "__main__":
         ml.saveBestOnly = False
         ml.startExprQ()
     else:
-        model = load_model(model_path)
+        model = keras.models.load_model(model_path)
 
     Y_pred = model.predict_generator(TestGen)
     y_pred = np.argmax(Y_pred, axis=1)
