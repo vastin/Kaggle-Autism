@@ -83,7 +83,7 @@ def MakeModel(dlsize):
         layer.trainable = True
 
 
-    DerivedModel.compile(keras.optimizers.Adam(lr=lr_rate), loss='categorical_crossentropy', metrics=['accuracy'])
+    # DerivedModel.compile(keras.optimizers.Adam(lr=lr_rate), loss='categorical_crossentropy', metrics=['accuracy'])
     return DerivedModel
 
 def MakeModel2():
@@ -234,6 +234,7 @@ if __name__ == "__main__":
         ml.generator = True
         ml.saveBestOnly = False
         ml.startExprQ()
+        model.save('last_model.hdf5')
     else:
         model = keras.models.load_model(model_path)
 
